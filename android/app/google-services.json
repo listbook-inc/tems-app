@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "971133280304",
+    "project_id": "tems-9c268",
+    "storage_bucket": "tems-9c268.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:971133280304:android:d11173f059319268994df5",
+        "android_client_info": {
+          "package_name": "com.example.listbook"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDi9_2CeLzkARG-D_DRcbpHsTJ8gmTzQlg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
