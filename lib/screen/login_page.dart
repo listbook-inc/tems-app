@@ -1,8 +1,12 @@
+import 'dart:io';
+
 import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:listbook/auth/signin_apple.dart';
 import 'package:listbook/auth/signin_google.dart';
+import 'package:listbook/translation.dart';
 import 'package:listbook/utils/colors.dart';
 import 'package:listbook/widgets/login/login_button.dart';
 
@@ -16,6 +20,7 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   double? _containerHeight;
   late SignInGoogle _signInGoogle;
+  late SignInApple _signInApple;
 
   logoutAllAccount() async {
     await _signInGoogle.signOut();
@@ -24,6 +29,7 @@ class _LoginPageState extends State<LoginPage> {
   @override
   void initState() {
     _signInGoogle = SignInGoogle(context);
+    _signInApple = SignInApple(context);
     logoutAllAccount();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       FlutterNativeSplash.remove();
@@ -57,12 +63,14 @@ class _LoginPageState extends State<LoginPage> {
                     AnimatedTextKit(
                       animatedTexts: [
                         TypewriterAnimatedText(
-                          "Welcome to your\npersonal items\norganizer, Tems!",
+                          Translations.of(context)?.trans("splash_message") ??
+                              "Welcome to your\npersonal items\norganizer, Tems!",
                           textStyle: TextStyle(
                             color: CustomColors.grey3,
                             fontSize: 29,
                             fontWeight: FontWeight.w500,
                             fontStyle: FontStyle.normal,
+                            fontFamily: Translations.of(context)?.trans("point_font"),
                             height: 1.2,
                           ),
                           cursor: "|",
@@ -88,28 +96,32 @@ class _LoginPageState extends State<LoginPage> {
                         await _signInGoogle.signInWithGoogle(
                           context,
                         );
+                        // await GoogleSignIn().signIn();
                       },
                     ),
-                    const SizedBox(height: 8),
-                    LoginButton(
-                      assetsName: "assets/apple_white.svg",
-                      buttonText: "Apple",
-                      onClickButton: () {},
-                    ),
-                    const SizedBox(height: 10),
-                    TextButton(
-                      onPressed: () {},
-                      child: Text(
-                        "CONSENT TO USE THE SERVICE",
-                        style: TextStyle(
-                          fontFamily: "NeueMontreal",
-                          fontSize: 13,
-                          fontWeight: FontWeight.w500,
-                          color: CustomColors.accentGreen,
-                        ),
+                    if (Platform.isIOS) const SizedBox(height: 8),
+                    if (Platform.isIOS)
+                      LoginButton(
+                        assetsName: "assets/apple_white.svg",
+                        buttonText: "Apple",
+                        onClickButton: () {
+                          _signInApple.signInWithApple(context);
+                        },
                       ),
-                    ),
-                    const SizedBox(height: 20),
+                    // const SizedBox(height: 10),
+                    // TextButton(
+                    //   onPressed: () {},
+                    //   child: Text(
+                    //     "CONSENT TO USE THE SERVICE",
+                    //     style: TextStyle(
+                    //       fontFamily: Translations.of(context)?.trans("font") ?? "NeueMontreal",
+                    //       fontSize: 13,
+                    //       fontWeight: FontWeight.w500,
+                    //       color: CustomColors.accentGreen,
+                    //     ),
+                    //   ),
+                    // ),
+                    const SizedBox(height: 45),
                   ],
                 )
               ],

@@ -7,13 +7,18 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
-	<string>Listbook</string>
+	<string>TEMS</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
 	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
+	<key>CFBundleLocalizations</key>
+	<array>
+		<string>en</string>
+		<string>ko</string>
+	</array>
 	<key>CFBundleName</key>
 	<string>listbook</string>
 	<key>CFBundlePackageType</key>
@@ -43,15 +48,26 @@
 	<true/>
 	<key>NSAppTransportSecurity</key>
 	<dict>
+		<key>NSAllowsArbitraryLoads</key>
+		<true/>
+		<key>NSAllowsArbitraryLoadsInWebContent</key>
+		<true/>
 		<key>NSAllowsLocalNetworking</key>
 		<true/>
 	</dict>
+	<key>NSFaceIDUsageDescription</key>
+	<string>When you make security folder in the app, you can authenticate the folder with face id</string>
 	<key>NSCameraUsageDescription</key>
-	<string>Need camera access to take pictures</string>
+	<string>When registering your item in the app, a photo of the item needs to be uploaded to the server, and access to the camera is required to decorate the background when decorating the bucket.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>Need photo library access to select pictures</string>
+	<string>When registering your item in the app, a photo of the item needs to be uploaded to the server, and access to the Photo library is required to decorate the background when decorating the bucket.</string>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>fetch</string>
+		<string>remote-notification</string>
+	</array>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>

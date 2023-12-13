@@ -44,7 +44,7 @@ class SignInApple {
       return await FirebaseAuth.instance.signInWithCredential(oauthCredential);
     } catch (e) {
       Future.delayed(Duration.zero, () {
-        failedLogin(context);
+        failedLogin(context, null);
       });
       return null;
     }
@@ -88,7 +88,7 @@ class SignInApple {
 
     if (isSignUp) {
       print(idToken);
-      await _server.signIn(idToken).then((value) async {
+      await _server.signIn(idToken, context).then((value) async {
         print(value.data);
         await storage.write(key: accessTokenKey, value: value.data['accessToken']);
         await storage.write(key: refreshTokenKey, value: value.data['refreshToken']);
@@ -118,35 +118,39 @@ class SignInApple {
 
     if (isFail) {
       Future.delayed(Duration.zero, () {
-        failedLogin(context);
+        failedLogin(context, credential);
       });
       return;
     }
   }
 
-  failedLogin(BuildContext context) {
+  failedLogin(BuildContext context, dynamic credential) {
     showOkAlertDialog(
       context: context,
       title: "Failed To Login",
       message: "Sorry, Login failed try again",
     ).then(
-      (value) => Navigator.of(context).pushAndRemoveUntil(
-        PageRouteBuilder(
-          pageBuilder: (context, animation, secondaryAnimation) => const LoginPage(),
-          transitionsBuilder: (context, animation, secondaryAnimation, child) {
-            const begin = 0.0;
-            const end = 1.0;
-            const curve = Curves.easeInOut;
-            var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+      (value) {
+        if (credential != null) {
+          Navigator.of(context).pushAndRemoveUntil(
+            PageRouteBuilder(
+              pageBuilder: (context, animation, secondaryAnimation) => const LoginPage(),
+              transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                const begin = 0.0;
+                const end = 1.0;
+                const curve = Curves.easeInOut;
+                var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
 
-            return FadeTransition(
-              opacity: animation.drive(tween),
-              child: child,
-            );
-          },
-        ),
-        (route) => false,
-      ),
+                return FadeTransition(
+                  opacity: animation.drive(tween),
+                  child: child,
+                );
+              },
+            ),
+            (route) => false,
+          );
+        }
+      },
     );
   }
 

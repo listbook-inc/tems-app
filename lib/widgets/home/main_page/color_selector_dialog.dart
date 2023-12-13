@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:listbook/translation.dart';
 import 'package:listbook/utils/colors.dart';
 
 class ColorSelectorDialog extends StatefulWidget {
@@ -41,7 +42,7 @@ class _ColorSelectorDialogState extends State<ColorSelectorDialog> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    "Color",
+                    Translations.of(context)?.trans("color") ?? "Color",
                     style: TextStyle(
                       fontSize: 24,
                       color: CustomColors.black,
@@ -59,7 +60,7 @@ class _ColorSelectorDialogState extends State<ColorSelectorDialog> {
                       child: Container(
                         padding: const EdgeInsets.symmetric(horizontal: 6),
                         child: Text(
-                          "CLOSE",
+                          Translations.of(context)?.trans("close") ?? "CLOSE",
                           style: TextStyle(
                             fontSize: 12,
                             color: CustomColors.grey2,
@@ -128,7 +129,7 @@ class _ColorSelectorDialogState extends State<ColorSelectorDialog> {
                             ),
                             alignment: Alignment.center,
                             child: Text(
-                              "Select",
+                              Translations.of(context)?.trans("select") ?? "Select",
                               style: TextStyle(
                                 fontSize: 17,
                                 color: CustomColors.white,
@@ -153,7 +154,7 @@ class _ColorSelectorDialogState extends State<ColorSelectorDialog> {
                                 ),
                                 alignment: Alignment.center,
                                 child: Text(
-                                  "Select",
+                                  Translations.of(context)?.trans("select") ?? "Select",
                                   style: TextStyle(
                                     fontSize: 17,
                                     color: CustomColors.white,

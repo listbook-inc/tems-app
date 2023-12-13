@@ -16,7 +16,7 @@ publish_to: "none" # Remove this line if you wish to publish to pub.dev
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
 # In Windows, build-name is used as the major, minor, and patch parts
 # of the product and file versions while build-number is used as the build suffix.
-version: 1.0.0+1
+version: 1.5.0+56
 
 environment:
   sdk: ">=3.1.0-262.2.beta <4.0.0"
@@ -52,6 +52,31 @@ dependencies:
   drag_and_drop_lists: ^0.3.3
   package_info: ^2.0.2
   blur: ^3.1.0
+  flutter_launcher_icons: ^0.13.1
+  paged_vertical_calendar:
+    git:
+      url: https://github.com/yoct1994/flutter_calendar.git
+      ref: main
+  intl: ^0.18.1
+  url_launcher: ^6.1.14
+  flutter_vibrate: ^1.3.0
+  in_app_purchase: ^3.1.10
+  easy_image_viewer: ^1.2.1
+  fluttertoast: ^8.2.2
+  flutter_draggable_list: ^1.0.2
+  reorderables: ^0.6.0
+  firebase_messaging: ^14.6.9
+  flutter_local_notifications: ^16.2.0
+  flutter_swipe_action_cell: ^3.1.2
+  flutter_mentions: ^2.0.1
+  flutter_localizations:
+    sdk: flutter
+  flutter_email_sender: ^6.0.2
+  device_info_plus: ^9.1.1
+  local_auth: ^2.1.7
+  jalali_table_calendar: ^1.2.1
+  flutter_calendar_carousel: ^2.4.2
+  table_calendar: ^3.0.9
 
 dev_dependencies:
   flutter_test:
@@ -64,14 +89,40 @@ flutter:
   assets:
     - assets/
     - assets/default_bucket/
+    - assets/trans/
 
   fonts:
-    - family: NeueMontereal
+    - family: NeueMontreal
       fonts:
         - asset: fonts/NeueMontreal-Bold.otf
         - asset: fonts/NeueMontreal-Medium.otf
         - asset: fonts/NeueMontreal-Regular.otf
         - asset: fonts/NeueMontreal-Light.otf
+    - family: Pretendard
+      fonts:
+        - asset: fonts/Pretendard-Black.otf
+          weight: 900
+        - asset: fonts/Pretendard-ExtraBold.otf
+          weight: 800
+        - asset: fonts/Pretendard-SemiBold.otf
+          weight: 700
+        - asset: fonts/Pretendard-Bold.otf
+          weight: 600
+        - asset: fonts/Pretendard-Medium.otf
+          weight: 500
+        - asset: fonts/Pretendard-Regular.otf
+          weight: 400
+        - asset: fonts/Pretendard-Light.otf
+          weight: 300
+        - asset: fonts/Pretendard-ExtraLight.otf
+          weight: 200
+        - asset: fonts/Pretendard-Thin.otf
+          weight: 100
+
+    - family: CarerOne
+      fonts:
+        - asset: fonts/CarterOne-Regular.ttf
+          weight: 400
 
 flutter_native_splash:
   color: "#FFFFFF"
@@ -88,3 +139,8 @@ flutter_native_splash:
     icon_background_color: "#ffffff"
     image_dark: assets/TEAMS.png
     icon_background_color_dark: "#FFFFFF"
+
+flutter_icons:
+  image_path: "assets/App icon.jpg" # 아이콘용 이미지 경로
+  android: true
+  ios: true

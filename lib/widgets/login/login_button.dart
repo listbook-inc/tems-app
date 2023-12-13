@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:listbook/translation.dart';
 import 'package:listbook/utils/colors.dart';
 
 class LoginButton extends StatefulWidget {
@@ -43,7 +44,7 @@ class _LoginButtonState extends State<LoginButton> {
               Text(
                 widget.buttonText,
                 style: TextStyle(
-                  fontFamily: "NeueMontreal",
+                  fontFamily: Translations.of(context)?.trans("font") ?? "NeueMontreal",
                   fontSize: 17,
                   fontWeight: FontWeight.w400,
                   color: CustomColors.white,

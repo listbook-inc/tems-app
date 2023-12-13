@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:listbook/translation.dart';
 import 'package:listbook/utils/colors.dart';
 
 class PhotoEditBottomSheet extends StatefulWidget {
@@ -68,7 +69,7 @@ class _PhotoEditBottomSheetState extends State<PhotoEditBottomSheet> {
                       ),
                       const SizedBox(width: 14),
                       Text(
-                        "Photo album",
+                        Translations.of(context)?.trans("photo_album") ?? "Photo album",
                         style: TextStyle(
                           fontSize: 17,
                           fontWeight: FontWeight.w500,
@@ -118,7 +119,7 @@ class _PhotoEditBottomSheetState extends State<PhotoEditBottomSheet> {
                       ),
                       const SizedBox(width: 14),
                       Text(
-                        "Take a photo",
+                        Translations.of(context)?.trans("take_a_photo") ?? "Take a photo",
                         style: TextStyle(
                           fontSize: 17,
                           fontWeight: FontWeight.w500,
@@ -169,7 +170,7 @@ class _PhotoEditBottomSheetState extends State<PhotoEditBottomSheet> {
                       ),
                       const SizedBox(width: 14),
                       Text(
-                        "Delete photo",
+                        Translations.of(context)?.trans("delete_photo") ?? "Delete photo",
                         style: TextStyle(
                           fontSize: 17,
                           fontWeight: FontWeight.w500,

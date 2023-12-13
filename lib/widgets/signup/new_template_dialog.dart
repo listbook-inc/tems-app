@@ -1,9 +1,12 @@
+import 'package:adaptive_dialog/adaptive_dialog.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:listbook/server/server.dart';
+import 'package:listbook/translation.dart';
 import 'package:listbook/utils/colors.dart';
+import 'package:local_auth/local_auth.dart';
 
 class NewTemplateDialog extends StatefulWidget {
-  final Future<void> Function(String name) onSuccess;
+  final Future<void> Function(String name, bool isSecurityFolder) onSuccess;
 
   const NewTemplateDialog({super.key, required this.onSuccess});
 
@@ -14,6 +17,9 @@ class NewTemplateDialog extends StatefulWidget {
 class _NewTemplateDialogState extends State<NewTemplateDialog> {
   final TextEditingController _controller = TextEditingController();
   String _bucketName = "";
+  bool _isSecurity = false;
+
+  final localAuth = LocalAuthentication();
 
   @override
   void initState() {
@@ -47,7 +53,7 @@ class _NewTemplateDialogState extends State<NewTemplateDialog> {
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   Text(
-                    "Template name",
+                    Translations.of(context)?.trans("template_name") ?? "",
                     style: TextStyle(
                       fontSize: 15,
                       color: CustomColors.grey3,
@@ -67,7 +73,7 @@ class _NewTemplateDialogState extends State<NewTemplateDialog> {
                   autofocus: true,
                   decoration: InputDecoration(
                     border: InputBorder.none,
-                    hintText: "e.g. Camping",
+                    hintText: Translations.of(context)?.trans("e_g_camping"),
                     hintStyle: TextStyle(
                       fontSize: 17,
                       color: CustomColors.grey,
@@ -83,7 +89,57 @@ class _NewTemplateDialogState extends State<NewTemplateDialog> {
                   ),
                 ),
               ),
-              const SizedBox(height: 39),
+              const SizedBox(height: 25),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    Text(
+                      Translations.of(context)?.trans("security") ?? "",
+                      style: const TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    CupertinoSwitch(
+                      value: _isSecurity,
+                      onChanged: (value) async {
+                        if (value) {
+                          print(await localAuth.canCheckBiometrics);
+                          if (!await localAuth.canCheckBiometrics) {
+                            showOkAlertDialog(
+                              context: context,
+                              title: "Auth faild",
+                              message: "Not available biometric authentication",
+                            );
+                            return;
+                          }
+
+                          final authentication = await localAuth.authenticate(
+                            localizedReason: "Please authenticate to show account balance",
+                          );
+
+                          print(authentication);
+
+                          if (authentication) {
+                            setState(() {
+                              _isSecurity = authentication;
+                            });
+                          }
+
+                          return;
+                        }
+                        setState(() {
+                          _isSecurity = value;
+                        });
+                      },
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 25),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -103,7 +159,7 @@ class _NewTemplateDialogState extends State<NewTemplateDialog> {
                           ),
                           alignment: Alignment.center,
                           child: Text(
-                            "Cancel",
+                            Translations.of(context)?.trans("cancel") ?? "",
                             style: TextStyle(
                               fontSize: 17,
                               color: CustomColors.darkGrey,
@@ -114,7 +170,7 @@ class _NewTemplateDialogState extends State<NewTemplateDialog> {
                       ),
                     ),
                   ),
-                  const SizedBox(width: 22),
+                  const SizedBox(width: 25),
                   _bucketName == ""
                       ? Expanded(
                           child: Container(
@@ -125,7 +181,7 @@ class _NewTemplateDialogState extends State<NewTemplateDialog> {
                             ),
                             alignment: Alignment.center,
                             child: Text(
-                              "Let's make it",
+                              Translations.of(context)?.trans("lets_make_it") ?? "",
                               style: TextStyle(
                                 fontSize: 17,
                                 color: CustomColors.white,
@@ -141,7 +197,9 @@ class _NewTemplateDialogState extends State<NewTemplateDialog> {
                             child: InkWell(
                               borderRadius: BorderRadius.circular(30),
                               onTap: () async {
-                                await widget.onSuccess(_controller.text).then((value) => Navigator.pop(context));
+                                await widget
+                                    .onSuccess(_controller.text, _isSecurity)
+                                    .then((value) => Navigator.pop(context));
                               },
                               child: Container(
                                 height: 53,
@@ -150,7 +208,7 @@ class _NewTemplateDialogState extends State<NewTemplateDialog> {
                                 ),
                                 alignment: Alignment.center,
                                 child: Text(
-                                  "Let's make it",
+                                  Translations.of(context)?.trans("lets_make_it") ?? "",
                                   style: TextStyle(
                                     fontSize: 17,
                                     color: CustomColors.white,

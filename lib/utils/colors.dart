@@ -49,21 +49,21 @@ class CustomColors {
   static Color folderBlue500 = const Color(0xFF4D4DF6);
   static Color folderPink500 = const Color(0xFFEC5BF7);
   static Color folderPurple500 = const Color(0xFF9E65E3);
-  static Color folderYellow500 = const Color(0xFFFFFF54);
+  static Color folderYellow500 = const Color(0xFF447DD2);
   static Color folderDarkGreen400 = const Color(0xFF03624C);
   static Color folderGreen400 = const Color(0xFF00DF81);
   static Color folderOrange400 = const Color(0xFFF9DCA1);
   static Color folderBlue400 = const Color(0xFF9999F8);
   static Color folderPink400 = const Color(0xFFF19EF9);
   static Color folderPurple400 = const Color(0xFFC7A6EE);
-  static Color folderYellow400 = const Color(0xFFFFFFA6);
+  static Color folderYellow400 = const Color(0xFF619EF7);
   static Color folderDarkGreen300 = const Color(0xFF56A68D);
   static Color folderGreen300 = const Color(0xFFBEF6DC);
   static Color folderOrange300 = const Color(0xFFFBE8C3);
   static Color folderBlue300 = const Color(0xFFC2C2FA);
   static Color folderPink300 = const Color(0xFFF6C4FB);
   static Color folderPurple300 = const Color(0xFFDDCAF5);
-  static Color folderYellow300 = const Color(0xFFFFFFC5);
+  static Color folderYellow300 = const Color(0xFF8FBDFF);
   static List<Color> getFolderColors() {
     return [
       folderDarkGrey,

@@ -1,10 +1,15 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:listbook/screen/item_manage_detail_page.dart';
 import 'package:listbook/server/server.dart';
+import 'package:listbook/translation.dart';
 import 'package:listbook/utils/colors.dart';
 
 class ItemManagementPage extends StatefulWidget {
-  const ItemManagementPage({super.key});
+  final Function() refresh;
+
+  const ItemManagementPage({super.key, required this.refresh});
 
   @override
   State<ItemManagementPage> createState() => _ItemManagementPageState();
@@ -40,8 +45,10 @@ class _ItemManagementPageState extends State<ItemManagementPage> {
     return Scaffold(
       backgroundColor: CustomColors.white,
       appBar: AppBar(
+        backgroundColor: CustomColors.white,
+        surfaceTintColor: Colors.transparent,
         title: Text(
-          "Item management",
+          Translations.of(context)?.trans("item_management_title") ?? "",
           style: TextStyle(
             fontSize: 26,
             color: CustomColors.black,
@@ -73,7 +80,7 @@ class _ItemManagementPageState extends State<ItemManagementPage> {
                       ),
                       const SizedBox(width: 4),
                       Text(
-                        "Latest",
+                        Translations.of(context)?.trans("latest") ?? "Latest",
                         style: TextStyle(
                           fontSize: 17,
                           color: CustomColors.grey2,
@@ -120,6 +127,26 @@ class _ItemManagementPageState extends State<ItemManagementPage> {
                           ),
                         );
                       } else {
+                        if (snapshot.data!.isEmpty) {
+                          return Center(
+                            child: Container(
+                              margin: const EdgeInsets.only(top: 120),
+                              child: Column(
+                                children: [
+                                  Icon(CupertinoIcons.search, size: 45, color: CustomColors.grey),
+                                  const SizedBox(height: 20),
+                                  Text(
+                                    Translations.of(context)?.trans("no_manage_item") ??
+                                        "There are no items to manage, you must add items first",
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(fontSize: 16, color: CustomColors.grey),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                        }
+
                         return Container(
                           constraints: BoxConstraints(
                             minHeight: safeAreaHeight,
@@ -133,7 +160,22 @@ class _ItemManagementPageState extends State<ItemManagementPage> {
                                     Material(
                                       color: CustomColors.white,
                                       child: InkWell(
-                                        onTap: () {},
+                                        onTap: () async {
+                                          await Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) => ItemManageDetailPage(
+                                                item: snapshot.data![i],
+                                                refresh: widget.refresh,
+                                              ),
+                                            ),
+                                          ).then((value) {
+                                            setState(() {
+                                              items = getManageItems();
+                                            });
+                                            widget.refresh();
+                                          });
+                                        },
                                         borderRadius: BorderRadius.circular(10),
                                         child: SizedBox(
                                           height: 83,
@@ -162,7 +204,7 @@ class _ItemManagementPageState extends State<ItemManagementPage> {
                                                   crossAxisAlignment: CrossAxisAlignment.start,
                                                   children: [
                                                     Text(
-                                                      "Apple Watch Nike Series 7",
+                                                      snapshot.data![i]['itemName'],
                                                       style: TextStyle(
                                                         fontSize: 17,
                                                         fontWeight: FontWeight.w500,

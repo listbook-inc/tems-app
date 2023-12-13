@@ -8,10 +8,12 @@ import 'package:image_picker/image_picker.dart';
 import 'package:listbook/provider/home_page_provider.dart';
 import 'package:listbook/screen/login_page.dart';
 import 'package:listbook/server/server.dart';
+import 'package:listbook/translation.dart';
 import 'package:listbook/utils/colors.dart';
 import 'package:listbook/utils/image_compress.dart';
 import 'package:listbook/utils/instance.dart';
 import 'package:listbook/widgets/home/profile_page/photo_edit_bottom_sheet.dart';
+import 'package:listbook/widgets/profile_setting/delete_account_dialog.dart';
 import 'package:provider/provider.dart';
 
 class ProfileSettingPage extends StatefulWidget {
@@ -44,6 +46,20 @@ class _ProfileSettingPageState extends State<ProfileSettingPage> {
     _emailController.text = email;
 
     _server = Server(context);
+
+    _nicknameController.addListener(() async {
+      await _server.updateUserInfo({
+        "nickname": _nicknameController.text,
+        "email": _emailController.text,
+      });
+    });
+
+    _emailController.addListener(() async {
+      await _server.updateUserInfo({
+        "nickname": _nicknameController.text,
+        "email": _emailController.text,
+      });
+    });
   }
 
   @override
@@ -57,8 +73,10 @@ class _ProfileSettingPageState extends State<ProfileSettingPage> {
     return Scaffold(
       backgroundColor: CustomColors.white,
       appBar: AppBar(
+        backgroundColor: CustomColors.white,
+        surfaceTintColor: Colors.transparent,
         title: Text(
-          "My account",
+          Translations.of(context)?.trans("my_account") ?? "My account",
           style: TextStyle(
             fontSize: 26,
             color: CustomColors.black,
@@ -297,7 +315,7 @@ class _ProfileSettingPageState extends State<ProfileSettingPage> {
                           children: [
                             const SizedBox(width: 16),
                             Text(
-                              "Name",
+                              Translations.of(context)?.trans("name") ?? "Name",
                               style: TextStyle(
                                 fontSize: 15,
                                 color: CustomColors.grey3,
@@ -325,7 +343,7 @@ class _ProfileSettingPageState extends State<ProfileSettingPage> {
                             focusNode: nicknameFocus,
                             decoration: InputDecoration(
                               border: InputBorder.none,
-                              hintText: "Nickname",
+                              hintText: Translations.of(context)?.trans("name"),
                               hintStyle: TextStyle(
                                 fontSize: 17,
                                 color: CustomColors.grey,
@@ -351,7 +369,7 @@ class _ProfileSettingPageState extends State<ProfileSettingPage> {
                           children: [
                             const SizedBox(width: 16),
                             Text(
-                              "E-mail",
+                              Translations.of(context)?.trans("email") ?? "E-mail",
                               style: TextStyle(
                                 fontSize: 15,
                                 color: CustomColors.grey3,
@@ -369,6 +387,7 @@ class _ProfileSettingPageState extends State<ProfileSettingPage> {
                             color: CustomColors.lightGrey,
                           ),
                           child: TextField(
+                            enabled: false,
                             controller: _emailController,
                             focusNode: emailFocus,
                             onTapOutside: (value) {
@@ -376,7 +395,7 @@ class _ProfileSettingPageState extends State<ProfileSettingPage> {
                             },
                             decoration: InputDecoration(
                               border: InputBorder.none,
-                              hintText: "E-mail",
+                              hintText: Translations.of(context)?.trans("email") ?? "E-mail",
                               hintStyle: TextStyle(
                                 fontSize: 17,
                                 color: CustomColors.grey,
@@ -420,7 +439,7 @@ class _ProfileSettingPageState extends State<ProfileSettingPage> {
                         alignment: Alignment.center,
                         height: 53,
                         child: Text(
-                          "Sign out",
+                          Translations.of(context)?.trans("sign_out") ?? "Sign out",
                           style: TextStyle(
                             fontSize: 17,
                             fontWeight: FontWeight.w500,
@@ -439,13 +458,39 @@ class _ProfileSettingPageState extends State<ProfileSettingPage> {
                     color: CustomColors.white,
                     borderRadius: BorderRadius.circular(30),
                     child: InkWell(
-                      onTap: () {},
+                      onTap: () {
+                        showDialog(
+                          context: context,
+                          builder: (context) => DeleteCheckDialog(
+                            onSuccess: () async {
+                              await _server.deleteAccount().then((value) async {
+                                final storage = Instance.getInstanceStorage();
+                                await storage.deleteAll().then(
+                                      (value) => Navigator.pushAndRemoveUntil(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => const LoginPage(),
+                                        ),
+                                        (route) => false,
+                                      ),
+                                    );
+                              }).catchError((err) {
+                                showOkAlertDialog(
+                                  context: context,
+                                  title: "Faild Delete Account",
+                                  message: "Cannot delete account because of server",
+                                );
+                              });
+                            },
+                          ),
+                        );
+                      },
                       borderRadius: BorderRadius.circular(30),
                       child: Container(
                         alignment: Alignment.center,
                         height: 53,
                         child: Text(
-                          "Delete your account",
+                          Translations.of(context)?.trans("delete_my_account") ?? "Delete your account",
                           style: TextStyle(
                             fontSize: 17,
                             fontWeight: FontWeight.w500,

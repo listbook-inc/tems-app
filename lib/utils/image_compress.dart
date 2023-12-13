@@ -3,11 +3,11 @@ import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 
 String thumbnailCompress(String input, String output) {
-  return '-i "file://$input" -qscale:v 5 -vf "scale=\'min(173,iw)\':-2" "$output"';
+  return '-i "file://$input" -qscale:v 5 -vf "scale=\'min(480,iw)\':-2" "$output"';
 }
 
 String imageCompress(String input, String output) {
-  return '-i "file://$input" -qscale:v 5 -vf "scale=\'min(720,iw)\':-2" -y "$output"';
+  return '-i "file://$input" -qscale:v 5 -vf "scale=\'min(1080,iw)\':-2" -y "$output"';
 }
 
 class CompressDto {

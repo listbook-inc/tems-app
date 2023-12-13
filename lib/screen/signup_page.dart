@@ -5,9 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:listbook/screen/home_page.dart';
 import 'package:listbook/server/server.dart';
+import 'package:listbook/translation.dart';
 import 'package:listbook/utils/colors.dart';
 import 'package:listbook/utils/instance.dart';
-import 'package:listbook/widgets/global/payment_bottom_sheet.dart';
 import 'package:listbook/widgets/signup/new_template_dialog.dart';
 
 class SignUpPage extends StatefulWidget {
@@ -65,20 +65,20 @@ class SignUpPageState extends State<SignUpPage> {
     final findIdx = selectList.indexWhere((element) => element == bucketIdx);
 
     if (findIdx == -1 && selectList.length == 3) {
-      showModalBottomSheet(
-        isScrollControlled: true,
-        backgroundColor: CustomColors.black,
-        shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(20.0),
-            topRight: Radius.circular(20.0),
-          ),
-        ),
-        context: context,
-        builder: (context) {
-          return const PaymentBottomSheet();
-        },
-      );
+      // showModalBottomSheet(
+      //   isScrollControlled: true,
+      //   backgroundColor: CustomColors.black,
+      //   shape: const RoundedRectangleBorder(
+      //     borderRadius: BorderRadius.only(
+      //       topLeft: Radius.circular(20.0),
+      //       topRight: Radius.circular(20.0),
+      //     ),
+      //   ),
+      //   context: context,
+      //   builder: (context) {
+      //     return const PaymentBottomSheet();
+      //   },
+      // );
       return;
     }
 
@@ -97,7 +97,10 @@ class SignUpPageState extends State<SignUpPage> {
 
     return Scaffold(
       backgroundColor: CustomColors.white,
-      appBar: AppBar(),
+      appBar: AppBar(
+        backgroundColor: CustomColors.white,
+        surfaceTintColor: Colors.transparent,
+      ),
       body: SafeArea(
         child: RefreshIndicator(
           onRefresh: onRefresh,
@@ -112,9 +115,11 @@ class SignUpPageState extends State<SignUpPage> {
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
                       Text(
-                        "What kind of bucket do you\nwant to add first?",
+                        Translations.of(context)?.trans("select_bucket_title") ??
+                            "What kind of bucket do you\nwant to add first?",
                         style: TextStyle(
-                          fontSize: 24,
+                          fontSize: 21,
+                          fontFamily: Translations.of(context)?.trans("point_font"),
                           fontWeight: FontWeight.w500,
                           color: CustomColors.darkGreen,
                         ),
@@ -132,7 +137,7 @@ class SignUpPageState extends State<SignUpPage> {
                       ),
                       const SizedBox(height: 20),
                       Text(
-                        "Category Not Found, Try Again",
+                        Translations.of(context)?.trans("no_category_message") ?? "Category Not Found, Try Again",
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w400,
@@ -173,7 +178,7 @@ class SignUpPageState extends State<SignUpPage> {
                                     context: context,
                                     builder: (context) {
                                       return NewTemplateDialog(
-                                        onSuccess: (name) async {
+                                        onSuccess: (name, security) async {
                                           await _server.makeBucket(name).then((value) {
                                             setState(() {
                                               if (selectList.length < 3) {
@@ -274,7 +279,8 @@ class SignUpPageState extends State<SignUpPage> {
                                   child: Text(
                                     _categories['buckets'][index]['bucketName'],
                                     style: TextStyle(
-                                      fontSize: 23,
+                                      fontSize: 20,
+                                      fontFamily: Translations.of(context)?.trans("point_font"),
                                       fontWeight: FontWeight.w500,
                                       color: CustomColors.white,
                                       height: 1,
@@ -319,6 +325,8 @@ class SignUpPageState extends State<SignUpPage> {
                         borderRadius: BorderRadius.circular(30),
                         child: InkWell(
                           borderRadius: BorderRadius.circular(30),
+                          highlightColor: selectList.length >= 3 ? null : CustomColors.lightGrey,
+                          splashColor: selectList.length >= 3 ? null : CustomColors.lightGrey,
                           onTap: () async {
                             List<String> defaultBuckets = [];
                             List<String> bucketNames = [];
@@ -348,7 +356,7 @@ class SignUpPageState extends State<SignUpPage> {
                               },
                             );
 
-                            await _server.signUp(widget.idToken, formData).then((value) async {
+                            await _server.signUp(widget.idToken, formData, context).then((value) async {
                               await storage.write(key: accessTokenKey, value: value.data['accessToken']);
                               await storage.write(key: refreshTokenKey, value: value.data['refreshToken']);
                               await storage.write(key: expireKey, value: value.data['expiredAt'].toString());
@@ -378,7 +386,7 @@ class SignUpPageState extends State<SignUpPage> {
                             height: 53,
                             alignment: Alignment.center,
                             child: Text(
-                              "Select",
+                              Translations.of(context)?.trans("select") ?? "Select",
                               style: TextStyle(
                                 fontSize: 17,
                                 color: selectList.length >= 3 ? CustomColors.white : CustomColors.black,
@@ -406,14 +414,14 @@ class SignUpPageState extends State<SignUpPage> {
 
                             final formData = FormData.fromMap(
                               {
-                                "selectBucketNames": defaultBuckets,
+                                "selectBuckets": defaultBuckets,
                                 "bucketNames": bucketNames,
                                 "bucketImages": bucketImages,
                                 "bucketThumbnails": bucketThumbnails,
                               },
                             );
 
-                            await _server.signUp(widget.idToken, formData).then((value) async {
+                            await _server.signUp(widget.idToken, formData, context).then((value) async {
                               await storage.write(key: accessTokenKey, value: value.data['accessToken']);
                               await storage.write(key: refreshTokenKey, value: value.data['refreshToken']);
                               await storage.write(key: expireKey, value: value.data['expiredAt'].toString());
@@ -443,7 +451,7 @@ class SignUpPageState extends State<SignUpPage> {
                             height: 53,
                             alignment: Alignment.center,
                             child: Text(
-                              "Skip",
+                              Translations.of(context)?.trans("skip") ?? "Skip",
                               style: TextStyle(
                                 fontSize: 17,
                                 color: CustomColors.black,

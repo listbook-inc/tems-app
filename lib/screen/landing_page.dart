@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:listbook/translation.dart';
 import 'package:listbook/utils/colors.dart';
 
 class LandingPage extends StatefulWidget {
@@ -27,7 +28,7 @@ class _LandingPageState extends State<LandingPage> {
             Text(
               "Processing Login",
               style: TextStyle(
-                fontFamily: "NeueMontreal",
+                fontFamily: Translations.of(context)?.trans("font") ?? "NeueMontreal",
                 fontSize: 16,
                 color: CustomColors.black,
               ),

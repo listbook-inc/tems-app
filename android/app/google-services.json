@@ -12,7 +12,12 @@
           "package_name": "com.example.listbook"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "971133280304-r0m96aosgsqiad87g617qrr379rjam6u.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyDi9_2CeLzkARG-D_DRcbpHsTJ8gmTzQlg"
@@ -20,7 +25,63 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "971133280304-r0m96aosgsqiad87g617qrr379rjam6u.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "971133280304-5b6idhhglf2fq51dak2kl2410ogln49i.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.listbook.tems"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:971133280304:android:3142bb79487a57df994df5",
+        "android_client_info": {
+          "package_name": "com.listbook.tems"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "971133280304-gt7rjn13mra3th059sbok4l2vrj48qvi.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.listbook.tems",
+            "certificate_hash": "759a7323ae5e39b3d8216b90dbd7463f751e7e76"
+          }
+        },
+        {
+          "client_id": "971133280304-r0m96aosgsqiad87g617qrr379rjam6u.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDi9_2CeLzkARG-D_DRcbpHsTJ8gmTzQlg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "971133280304-r0m96aosgsqiad87g617qrr379rjam6u.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "971133280304-5b6idhhglf2fq51dak2kl2410ogln49i.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.listbook.tems"
+              }
+            }
+          ]
         }
       }
     }

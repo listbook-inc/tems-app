@@ -1,20 +1,25 @@
 import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:dio/dio.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:listbook/screen/login_page.dart';
+import 'package:listbook/translation.dart';
 
 const s3URL = "https://tems-image-bucket.s3.ap-northeast-2.amazonaws.com/";
 // const _baseUrl = "http://localhost:8040";
-const _baseUrl = "http://192.168.0.5:8040";
+// const _baseUrl = "http://192.168.0.5:8040";
+// const _baseUrl = "http://172.20.10.9:8040";
+const _baseUrl = "https://tems.listbook.com:8040";
 const accessTokenKey = "ACCESS_TOKEN";
 const refreshTokenKey = "REFRESH_TOKEN";
 const expireKey = "EXPIRE_DATE";
 
 class TemsInterceptor extends Interceptor {
   final Function() onFailedRefresh;
+  final Dio dio = Dio();
 
-  const TemsInterceptor({required this.onFailedRefresh});
+  TemsInterceptor({required this.onFailedRefresh});
 
   final storage = const FlutterSecureStorage(
     aOptions: AndroidOptions(encryptedSharedPreferences: true),
@@ -30,39 +35,40 @@ class TemsInterceptor extends Interceptor {
     // };
     print(options.headers);
 
-    final expiredAt = await storage.read(key: expireKey);
-    print(expiredAt);
-    if (expiredAt != null) {
-      final expiredByNum = int.tryParse(expiredAt);
-      print(expiredByNum);
-      if (expiredByNum != null) {
-        final expiredDate = DateTime.fromMillisecondsSinceEpoch(expiredByNum);
-        print(expiredDate);
+    // final expiredAt = await storage.read(key: expireKey);
+    // print(expiredAt);
+    // if (expiredAt != null) {
+    //   final expiredByNum = int.tryParse(expiredAt);
+    //   print(expiredByNum);
+    //   if (expiredByNum != null) {
+    //     final expiredDate = DateTime.fromMillisecondsSinceEpoch(expiredByNum);
+    //     print(expiredDate);
 
-        if (DateTime.now().isAfter(expiredDate)) {
-          final refreshToken = await storage.read(key: refreshTokenKey);
+    //     if (DateTime.now().isAfter(expiredDate)) {
+    //       final refreshToken = await storage.read(key: refreshTokenKey);
 
-          Dio()
-              .put(
-            "$_baseUrl/auth/refreshtoken",
-            options: Options(
-              headers: {
-                "X-Refresh-Token": "Bearer $refreshToken",
-              },
-            ),
-          )
-              .then((value) async {
-            await storage.write(key: accessTokenKey, value: value.data['accessToken']);
-            await storage.write(key: refreshTokenKey, value: value.data['refreshToken']);
-            await storage.write(key: expireKey, value: value.data['expiredAt'].toString());
-          }).catchError((err) async {
-            print(err);
-            await storage.deleteAll();
-            onFailedRefresh();
-          });
-        }
-      }
-    }
+    //       await dio
+    //           .put(
+    //         "$_baseUrl/auth/refreshtoken",
+    //         options: Options(
+    //           headers: {
+    //             "X-Refresh-Token": "Bearer $refreshToken",
+    //           },
+    //         ),
+    //       )
+    //           .then((value) async {
+    //         await storage.deleteAll();
+    //         await storage.write(key: accessTokenKey, value: value.data['accessToken']);
+    //         await storage.write(key: refreshTokenKey, value: value.data['refreshToken']);
+    //         await storage.write(key: expireKey, value: value.data['expiredAt'].toString());
+    //       }).catchError((err) async {
+    //         print(err);
+    //         await storage.deleteAll();
+    //         onFailedRefresh();
+    //       });
+    //     }
+    //   }
+    // }
 
     super.onRequest(options, handler);
   }
@@ -87,7 +93,7 @@ class TemsInterceptor extends Interceptor {
 class Server {
   late Dio _authDio;
   late Dio _noneAuthDio;
-  final _photoRoomApiKey = "93a5232956dbb076b68f6237f1ccd009680e71f1";
+  final _photoRoomApiKey = "b786b0325af0eaf1ca18cf10a764168d6bf17f31";
 
   Server(BuildContext context) {
     _authDio = Dio(BaseOptions(
@@ -133,23 +139,44 @@ class Server {
     );
   }
 
-  Future<Response> signUp(String? idToken, FormData formData) async {
+  Future<Response> signUp(String? idToken, FormData formData, BuildContext context) async {
+    final deviceToken = await FirebaseMessaging.instance.getToken();
+
+    String? locale = Translations.of(context)?.getLocale();
+    print("======LOCALE======");
+    print(locale);
+    print("======LOCALE======");
+
     return await _noneAuthDio.post(
       "/auth/signup",
       data: formData,
       options: Options(
         headers: {
           "X-ID-TOKEN": idToken,
+          "X-DEVICE-TOKEN": deviceToken,
+          "X-LOCALE": locale,
         },
       ),
     );
   }
 
-  Future<Response> signIn(String? idToken) async {
+  Future<Response> signIn(String? idToken, BuildContext context) async {
+    final deviceToken = await FirebaseMessaging.instance.getToken();
+
+    String? locale = Translations.of(context)?.getLocale();
+
+    print("======LOCALE======");
+    print(locale);
+    print("======LOCALE======");
+
     return await _noneAuthDio.post(
       '/auth/signin',
       options: Options(
-        headers: {"X-ID-TOKEN": idToken},
+        headers: {
+          "X-ID-TOKEN": idToken,
+          "X-DEVICE-TOKEN": deviceToken,
+          "X-LOCALE": locale,
+        },
       ),
     );
   }
@@ -195,6 +222,20 @@ class Server {
     return await _authDio.put(
       "/bucket/change",
       data: data,
+      options: Options(
+        headers: {
+          "Authorization": await getToken(),
+        },
+      ),
+    );
+  }
+
+  Future<Response> updateSecurity(bool isSecurity, int bucketId) async {
+    return await _authDio.put(
+      "/bucket/item/security/$bucketId",
+      data: {
+        "isSecurity": isSecurity,
+      },
       options: Options(
         headers: {
           "Authorization": await getToken(),
@@ -277,6 +318,207 @@ class Server {
   Future<Response> getHistories() async {
     return await _authDio.get(
       "/bucket/histories",
+      options: Options(
+        headers: {
+          "Authorization": await getToken(),
+        },
+      ),
+    );
+  }
+
+  Future<Response> getBucketHistories(int bucketId) async {
+    return await _authDio.get(
+      "/bucket/bucket-histories/$bucketId",
+      options: Options(
+        headers: {
+          "Authorization": await getToken(),
+        },
+      ),
+    );
+  }
+
+  Future<Response> searchItemByName(String searchText) async {
+    return await _authDio.get(
+      "/bucket/search",
+      queryParameters: {
+        "searchText": searchText,
+      },
+      options: Options(
+        headers: {
+          "Authorization": await getToken(),
+        },
+      ),
+    );
+  }
+
+  Future<Response> editBucket(FormData formData, int bucketId) async {
+    return await _authDio.put(
+      "/bucket/edit/$bucketId",
+      data: formData,
+      options: Options(
+        headers: {
+          "Authorization": await getToken(),
+        },
+      ),
+    );
+  }
+
+  Future<Response> deleteBucket(int bucketId) async {
+    return await _authDio.delete(
+      "/bucket/$bucketId",
+      options: Options(
+        headers: {
+          "Authorization": await getToken(),
+        },
+      ),
+    );
+  }
+
+  Future<Response> uploadBucket(String name, String type, bool isSecurityFolder) async {
+    return await _authDio.post(
+      "/bucket/upload",
+      data: {
+        "bucketName": name,
+        "bucketType": type,
+        "isSecurityFolder": isSecurityFolder,
+      },
+      options: Options(
+        headers: {
+          "Authorization": await getToken(),
+        },
+      ),
+    );
+  }
+
+  Future<Response> updateItem(FormData formData, int itemId) async {
+    return await _authDio.put(
+      "/bucket/item/edit/$itemId",
+      data: formData,
+      options: Options(
+        headers: {
+          "Authorization": await getToken(),
+        },
+      ),
+    );
+  }
+
+  Future<Response> deleteItem(int itemId) async {
+    return await _authDio.delete(
+      "/bucket/item/$itemId",
+      options: Options(
+        headers: {
+          "Authorization": await getToken(),
+        },
+      ),
+    );
+  }
+
+  Future<Response> getRegisterLog() async {
+    return await _authDio.get(
+      "/bucket/item/register",
+      options: Options(
+        headers: {
+          "Authorization": await getToken(),
+        },
+      ),
+    );
+  }
+
+  Future<Response> useItem(int itemId) async {
+    return await _authDio.put(
+      "/bucket/item/use/$itemId",
+      options: Options(
+        headers: {
+          "Authorization": await getToken(),
+        },
+      ),
+    );
+  }
+
+  Future<Response> useDailyItem(int itemId) async {
+    return await _authDio.put(
+      "/bucket/item/use-daily/$itemId",
+      options: Options(
+        headers: {
+          "Authorization": await getToken(),
+        },
+      ),
+    );
+  }
+
+  Future<Response> getWelcomeMessage() async {
+    return await _authDio.get(
+      "/user/welcome",
+      options: Options(
+        headers: {
+          "Authorization": await getToken(),
+        },
+      ),
+    );
+  }
+
+  Future<Response> deleteAccount() async {
+    return await _authDio.delete(
+      "/user/account",
+      options: Options(
+        headers: {
+          "Authorization": await getToken(),
+        },
+      ),
+    );
+  }
+
+  Future<Response> verifyReceipts(String? receiptsData, bool isSandbox) async {
+    return await _noneAuthDio.post(
+      "/payment/verifyReceipt/apple",
+      data: {
+        "receipt-data": receiptsData,
+      },
+      options: Options(
+        headers: {
+          "Authorization": await getToken(),
+        },
+      ),
+    );
+  }
+
+  Future<Response> checkTrial() async {
+    return await _noneAuthDio.get(
+      "/user/check-trial",
+      options: Options(
+        headers: {
+          "Authorization": await getToken(),
+        },
+      ),
+    );
+  }
+
+  Future<Response> okFailRenew() async {
+    return await _authDio.put(
+      "/user/ok/fail",
+      options: Options(
+        headers: {
+          "Authorization": await getToken(),
+        },
+      ),
+    );
+  }
+
+  Future<Response> androidVerifyReceipt(Map<String, dynamic> query) async {
+    return await _authDio.post(
+      "/payment/android/subscription",
+      queryParameters: query,
+      options: Options(
+        headers: {
+          "Authorization": await getToken(),
+        },
+      ),
+    );
+  }
+
+  Future<Response> getAlarms() async {
+    return await _authDio.get(
+      "/user/alarm",
       options: Options(
         headers: {
           "Authorization": await getToken(),

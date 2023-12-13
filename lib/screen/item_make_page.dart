@@ -3,8 +3,10 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:listbook/screen/item_detail_page.dart';
 import 'package:listbook/server/server.dart';
+import 'package:listbook/translation.dart';
 import 'package:listbook/utils/colors.dart';
 import 'package:listbook/utils/image_compress.dart';
 import 'package:path_provider/path_provider.dart';
@@ -12,11 +14,13 @@ import 'package:path_provider/path_provider.dart';
 class ItemMakePage extends StatefulWidget {
   final CompressDto compressDto;
   final int bucketId;
+  final ImageSource retry;
 
   const ItemMakePage({
     super.key,
     required this.compressDto,
     required this.bucketId,
+    required this.retry,
   });
 
   @override
@@ -30,11 +34,14 @@ class _ItemMakePageState extends State<ItemMakePage> {
   File? _removeImage;
   File? _removeThumbnail;
 
+  CompressDto? compressDto;
+
   late Server _server;
 
   @override
   void initState() {
     _server = Server(context);
+    compressDto = widget.compressDto;
     super.initState();
   }
 
@@ -52,17 +59,18 @@ class _ItemMakePageState extends State<ItemMakePage> {
           child: _isBackgroundRemove
               ? Image.file(
                   _removeImage!,
-                  fit: BoxFit.cover,
+                  fit: BoxFit.contain,
                 )
               : Image.file(
-                  File(widget.compressDto.image),
-                  fit: BoxFit.cover,
+                  File(compressDto!.image),
+                  fit: BoxFit.contain,
                 ),
         ),
         Scaffold(
           backgroundColor: Colors.transparent,
           appBar: AppBar(
             backgroundColor: Colors.transparent,
+            surfaceTintColor: Colors.transparent,
             leading: IconButton(
               onPressed: () {
                 Navigator.pop(context);
@@ -96,7 +104,7 @@ class _ItemMakePageState extends State<ItemMakePage> {
                               ),
                               const SizedBox(height: 19),
                               Text(
-                                "Processing, please wait",
+                                Translations.of(context)?.trans("working_alert_message") ?? "",
                                 style: TextStyle(
                                   color: CustomColors.white,
                                   fontSize: 17,
@@ -122,8 +130,8 @@ class _ItemMakePageState extends State<ItemMakePage> {
                             borderRadius: BorderRadius.circular(30),
                             onTap: () async {
                               if (_isBackgroundRemove) {
-                                File image = File(widget.compressDto.image);
-                                File thumbnail = File(widget.compressDto.thumbnail);
+                                File image = File(compressDto!.image);
+                                File thumbnail = File(compressDto!.thumbnail);
 
                                 if (await image.exists()) {
                                   await image.delete();
@@ -152,8 +160,8 @@ class _ItemMakePageState extends State<ItemMakePage> {
                                     context,
                                     MaterialPageRoute(
                                       builder: (context) => ItemDetailPage(
-                                        imageDir: widget.compressDto.image,
-                                        thumbnailDir: widget.compressDto.thumbnail,
+                                        imageDir: compressDto!.image,
+                                        thumbnailDir: compressDto!.thumbnail,
                                         bucketId: widget.bucketId,
                                         isRemove: _isBackgroundRemove,
                                       ),
@@ -166,7 +174,7 @@ class _ItemMakePageState extends State<ItemMakePage> {
                               height: 53,
                               alignment: Alignment.center,
                               child: Text(
-                                "Save image",
+                                Translations.of(context)?.trans("save_image") ?? "",
                                 style: TextStyle(
                                   fontSize: 17,
                                   color: CustomColors.white,
@@ -192,8 +200,8 @@ class _ItemMakePageState extends State<ItemMakePage> {
                                   _isBackgroundLoading = true;
                                 });
                                 try {
-                                  File image = File(widget.compressDto.image);
-                                  File thumbnail = File(widget.compressDto.thumbnail);
+                                  File image = File(compressDto!.image);
+                                  File thumbnail = File(compressDto!.thumbnail);
 
                                   final dir = await getApplicationDocumentsDirectory();
 
@@ -272,7 +280,7 @@ class _ItemMakePageState extends State<ItemMakePage> {
                                   borderRadius: BorderRadius.circular(30),
                                 ),
                                 child: Text(
-                                  "Remove background",
+                                  Translations.of(context)?.trans("remove_background") ?? "",
                                   style: TextStyle(
                                     fontSize: 17,
                                     color: CustomColors.white,
@@ -292,7 +300,32 @@ class _ItemMakePageState extends State<ItemMakePage> {
                           color: CustomColors.lightGrey,
                           child: InkWell(
                             borderRadius: BorderRadius.circular(30),
-                            onTap: () async {},
+                            onTap: () async {
+                              if (_isBackgroundRemove) {
+                                File image = File(compressDto!.image);
+                                File thumbnail = File(compressDto!.thumbnail);
+
+                                if (await image.exists()) {
+                                  await image.delete();
+                                }
+
+                                if (await thumbnail.exists()) {
+                                  await thumbnail.delete();
+                                }
+
+                                setState(() {
+                                  _isBackgroundRemove = false;
+                                });
+                              } else {
+                                final image = await ImagePicker().pickImage(source: widget.retry);
+
+                                final dto = await compress(image);
+
+                                setState(() {
+                                  compressDto = dto;
+                                });
+                              }
+                            },
                             child: Container(
                               height: 53,
                               alignment: Alignment.center,
@@ -305,7 +338,7 @@ class _ItemMakePageState extends State<ItemMakePage> {
                                   SvgPicture.asset("assets/rotate-left.svg"),
                                   const SizedBox(width: 6),
                                   Text(
-                                    "Retry",
+                                    Translations.of(context)?.trans("retry") ?? "",
                                     style: TextStyle(
                                       fontSize: 17,
                                       color: CustomColors.black,
