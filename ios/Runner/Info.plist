@@ -42,6 +42,8 @@
 			</array>
 		</dict>
 	</array>
+	<key>GADApplicationIdentifier</key>
+	<string>ca-app-pub-2023096749198569~1297887103</string>
 	<key>CFBundleVersion</key>
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
 	<key>LSRequiresIPhoneOS</key>
